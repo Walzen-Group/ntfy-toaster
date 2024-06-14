@@ -208,6 +208,23 @@ func showNotification(data map[string]interface{}, topicURL string) {
 		}
 	}
 
+	if a, ok := data["attachment"].(map[string]interface{}); ok {
+		if url, ok := a["url"]; ok {
+			if toastNotification.Actions != nil {
+				toastNotification.Actions = append(toastNotification.Actions, toast.Action{
+					Type: "protocol",
+					Label: "View Attachment",
+					Arguments: url.(string),
+					HintInputId: "2",
+				})
+			} else {
+				toastNotification.Actions = []toast.Action{
+					{Type: "protocol", Label: "View Attachment", Arguments: url.(string), HintInputId: "2"},
+				}
+			}
+		}
+	}
+
 	if err := toastNotification.Push(); err != nil {
 		log.Errorf("Error showing notification: %v", err)
 	}
