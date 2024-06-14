@@ -11,7 +11,7 @@ Download executable and run. In the tray, you can right click on the ntfy icon a
 
 ## Configuration
 
-The `config.yaml`configuration file is located in the app directory. You can subscribe to topics by adding them to the `topics` list.
+The `config.yaml` configuration file is located in the app directory. You can subscribe to topics by adding them to the `topics` list.
 If the app is already running, there is no need to restart it, as the config file will be reloaed on save.
 
 ```yaml
