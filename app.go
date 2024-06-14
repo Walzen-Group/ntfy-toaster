@@ -272,7 +272,9 @@ func onReady() {
 	syncSubscriptions()
 
 	systray.SetIcon(iconIco)
-	systray.SetTitle("Walzen Ntfy Toast Client")
+	tooltip := "Walzen Ntfy Toast Client v0.0.3"
+	systray.SetTooltip(tooltip)
+	systray.SetTitle(tooltip)
 
 	mConfig := systray.AddMenuItem("Open Config", "Open the configuration file")
 	mQuit := systray.AddMenuItem("Quit", "Quit the application")
