@@ -2,7 +2,7 @@ name: Go
 
 on:
   release:
-    types: [created, edited]
+    types: [published]
 
 jobs:
   build-and-release:
@@ -22,32 +22,11 @@ jobs:
     - name: Build Windows GUI executable
       run: GOOS=windows GOARCH=amd64 go build -ldflags "-H windowsgui" -o wlzntfy-go.exe
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: wlzntfy-go
-        path: wlzntfy-go.exe
-
-    - name: Download artifact
-      uses: actions/download-artifact@v2
-      with:
-        name: wlzntfy-go
-
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      with:
-        tag_name: ${{ github.event.release.tag_name }}
-        release_name: ${{ github.event.release.name }}
-        body: ${{ github.event.release.body }}
-        draft: false
-        prerelease: false
-        token: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install GitHub CLI
+      run: sudo apt-get install gh
 
     - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./wlzntfy-go.exe
-        asset_name: wlzntfy-go.exe
-        asset_content_type: application/octet-stream
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release upload ${{ github.event.release.tag_name }} wlzntfy-go.exe
