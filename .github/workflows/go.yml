@@ -3,10 +3,9 @@ name: Go
 on:
   release:
     types: [created, edited]
-    branches: [master]
 
 jobs:
-  build:
+  build-and-release:
     runs-on: ubuntu-latest
 
     steps:
@@ -28,13 +27,6 @@ jobs:
       with:
         name: wlzntfy-go
         path: wlzntfy-go.exe
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
 
     - name: Download artifact
       uses: actions/download-artifact@v2
