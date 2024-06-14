@@ -59,7 +59,7 @@ func loadConfig() (*Config, error) {
 			Topics: map[string]Topic{
 				"your_topic": {
 					URL:   "your_topic_url",
-					Token: "your_token (optional)",
+					Token: "your_token (optional, you an leave this empty if not needed)",
 				},
 			},
 		}
@@ -139,8 +139,9 @@ func subscribe(ctx context.Context, topic Topic, messages chan<- map[string]inte
 		log.Errorf("Error creating request: %v", err)
 		return
 	}
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", topic.Token))
-
+	if topic.Token != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", topic.Token))
+	}
 	log.Infof("Subscribing to %s", url)
 
 	resp, err := http.DefaultClient.Do(req)
