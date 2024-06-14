@@ -53,28 +53,6 @@ func init() {
 }
 
 func loadConfig() (*Config, error) {
-	if _, err := os.Stat(configFile); os.IsNotExist(err) {
-		_ = os.MkdirAll(configPath, os.ModePerm)
-		defaultConfig := &Config{
-			Topics: map[string]Topic{
-				"your_topic": {
-					URL:   "your_topic_url",
-					Token: "your_token (optional, you an leave this empty if not needed)",
-				},
-			},
-		}
-		data, err := yaml.Marshal(defaultConfig)
-		if err != nil {
-			log.Fatalf("Could not marshal default config: %v", err)
-		}
-		err = os.WriteFile(configFile, data, 0644)
-		if err != nil {
-			log.Fatalf("Could not write config file: %v", err)
-		}
-		log.Printf("Default config created, please configure it in %s", configFile)
-		os.Exit(0)
-	}
-
 	data, err := os.ReadFile(configFile)
 	if err != nil {
 		return nil, fmt.Errorf("could not read config file: %w", err)
@@ -325,6 +303,28 @@ func main() {
 	// Write the embedded file to the target location
 	if err := os.WriteFile(outputPath, iconIco, os.ModePerm); err != nil {
 		panic(err)
+	}
+
+	if _, err := os.Stat(configFile); os.IsNotExist(err) {
+		_ = os.MkdirAll(configPath, os.ModePerm)
+		defaultConfig := &Config{
+			Topics: map[string]Topic{
+				"your_topic": {
+					URL:   "your_topic_url",
+					Token: "your_token (optional, you an leave this empty if not needed)",
+				},
+			},
+		}
+		data, err := yaml.Marshal(defaultConfig)
+		if err != nil {
+			log.Fatalf("Could not marshal default config: %v", err)
+			os.Exit(-1)
+		}
+		err = os.WriteFile(configFile, data, 0644)
+		if err != nil {
+			log.Fatalf("Could not write config file: %v", err)
+		}
+		log.Printf("Default config created, please configure it in %s", configFile)
 	}
 
 	watcher, err := watchConfig(configFile)
