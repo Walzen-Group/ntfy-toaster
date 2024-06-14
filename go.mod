@@ -7,11 +7,11 @@ require (
 	github.com/getlantern/systray v1.2.2
 	github.com/sirupsen/logrus v1.9.3
 	gopkg.in/yaml.v2 v2.4.0
+	github.com/akavel/rsrc v0.10.2
 )
 
 require (
-	github.com/akavel/rsrc v0.10.2 // indirect
-	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/fsnotify/fsnotify v1.7.0
 	github.com/getlantern/context v0.0.0-20220418194847-3d5e7a086201 // indirect
 	github.com/getlantern/errors v1.0.4 // indirect
 	github.com/getlantern/golog v0.0.0-20230503153817-8e72de7e0a65 // indirect
@@ -21,7 +21,7 @@ require (
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-stack/stack v1.8.1 // indirect
-	github.com/kyokomi/emoji v2.2.4+incompatible // indirect
+	github.com/kyokomi/emoji v2.2.4+incompatible
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	go.opentelemetry.io/otel v1.27.0 // indirect

@@ -114,7 +114,7 @@ func watchConfig(watchPath string) (*fsnotify.Watcher, error) {
 						configLock.Unlock()
 						syncSubscriptions()
 					}
-                }
+				}
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
@@ -209,13 +209,9 @@ func showNotification(data map[string]interface{}, topicURL string) {
 		}
 	}
 
-	ex, err := os.Executable()
-	if err != nil {
-		log.Errorf("Could not get executable path: %v", err)
-		return
-	}
-	reflectionPath := filepath.Dir(ex)
-	imagePath := filepath.Join(reflectionPath, "assets", "ntfy.ico")
+	activationUrl := topicURL
+
+	imagePath := filepath.Join(configPath, "assets", "ntfy.ico")
 
 	toastNotification := toast.Notification{
 		AppID:               "Woaster Ntfy",
@@ -224,7 +220,13 @@ func showNotification(data map[string]interface{}, topicURL string) {
 		Icon:                imagePath,
 		Attribution:         fmt.Sprintf("via %s", topicURL),
 		ActivationType:      "protocol",
-		ActivationArguments: topicURL,
+		ActivationArguments: activationUrl,
+	}
+
+	if c, ok := data["click"].(string); ok {
+		toastNotification.Actions = []toast.Action{
+			{Type: "protocol", Label: "Go to Event Source", Arguments: c, HintInputId: "1"},
+		}
 	}
 
 	if err := toastNotification.Push(); err != nil {
@@ -246,6 +248,9 @@ func syncSubscriptions() {
 	defer configLock.RUnlock()
 
 	// Cancel existing subscriptions
+	if len(cancelFuncs) > 0 {
+		log.Infof("Cancelling %d subscriptions", len(cancelFuncs))
+	}
 	for _, cancel := range cancelFuncs {
 		cancel()
 	}
@@ -308,6 +313,18 @@ func openExplorer(path string) {
 }
 
 func main() {
+
+	outputPath := filepath.Join(configPath, "assets", "ntfy.ico")
+
+	// Create the directory if it doesn't exist
+	if err := os.MkdirAll(filepath.Dir(outputPath), os.ModePerm); err != nil {
+		panic(err)
+	}
+
+	// Write the embedded file to the target location
+	if err := os.WriteFile(outputPath, iconIco, os.ModePerm); err != nil {
+		panic(err)
+	}
 
 	watcher, err := watchConfig(configFile)
 	if err != nil {
