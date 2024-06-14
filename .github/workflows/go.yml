@@ -22,11 +22,9 @@ jobs:
     - name: Build Windows GUI executable
       run: GOOS=windows GOARCH=amd64 go build -ldflags "-H windowsgui" -o wlzntfy-go.exe
 
-    - name: Install GitHub CLI
-      run: sudo apt-get install gh
-
-    - name: Upload Release Asset
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release upload ${{ github.event.release.tag_name }} wlzntfy-go.exe
+    - name: Upload binaries to release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: wlzntfy-go.exe
+        asset_name: wlzntfy-go.exe
