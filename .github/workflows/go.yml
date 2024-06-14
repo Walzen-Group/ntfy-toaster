@@ -3,16 +3,36 @@ name: Go
 on:
   release:
     types: [created, edited]
-    branches: [ master ]
+    branches: [master]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v2
-    - uses: wangyoucao577/go-release-action@v1
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.22
+
+    - name: Install dependencies
+      run: go mod tidy
+
+    - name: Build Windows GUI executable
+      run: GOOS=windows GOARCH=amd64 go build -ldflags "-H windowsgui" -o wlzntfy-go.exe
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: wlzntfy-go
+        path: wlzntfy-go.exe
+
+    - name: Publish Release
+      uses: wangyoucao577/go-release-action@v1
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         goos: windows
         goarch: amd64
-        binary_name: wlzntfy-go
+        binary_name: wlzntfy-go.exe

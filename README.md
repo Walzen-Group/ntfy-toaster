@@ -26,4 +26,6 @@ topics:
 
 ## Command line output
 
-If you want to see the raw output or error / info messages, you can run the app in a terminal.
+~~If you want to see the raw output or error / info messages, you can run the app in a terminal.~~
+
+Currently not working.
