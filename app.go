@@ -13,6 +13,7 @@ import (
 	"runtime"
 	"strings"
 	"sync"
+	"time"
 
 	toast "github.com/Walzen-Group/golang-toast-11"
 	"github.com/fsnotify/fsnotify"
@@ -122,37 +123,55 @@ func subscribe(ctx context.Context, topic Topic, messages chan<- map[string]inte
 	}
 	log.Infof("Subscribing to %s", url)
 
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		log.Errorf("Error subscribing to %s: %v", url, err)
-		return
-	}
-	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			log.Errorf("Error closing response body: %v", err)
-		}
-	}()
-
-	scanner := bufio.NewScanner(resp.Body)
 	for {
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			log.Errorf("Error subscribing to %s: %v", url, err)
+			time.Sleep(5 * time.Second) // Wait before retrying
+			continue
+		}
+
+		func() {
+			defer func() {
+				if err := resp.Body.Close(); err != nil {
+					log.Errorf("Error closing response body: %v", err)
+				}
+			}()
+
+			scanner := bufio.NewScanner(resp.Body)
+			for {
+				select {
+				case <-ctx.Done():
+					log.Infof("Stopping subscription to %s", url)
+					return
+				default:
+					if scanner.Scan() {
+						var data map[string]interface{}
+						err := json.Unmarshal(scanner.Bytes(), &data)
+						if err != nil {
+							log.Errorf("Error parsing JSON: %v", err)
+							continue
+						}
+						log.Debugf("Received data: %v", data)
+						messages <- data
+					} else if err := scanner.Err(); err != nil {
+						log.Errorf("Error reading response: %v", err)
+						return
+					} else {
+						// Handle case where scanner.Scan() returns false without an error
+						log.Warnf("Subscription to %s ended unexpectedly", url)
+						return
+					}
+				}
+			}
+		}()
+
+		log.Infof("Reconnecting to %s", url)
 		select {
 		case <-ctx.Done():
-			log.Infof("Stopping subscription to %s", url)
+			log.Infof("Stopping subscription to %s due to context done", url)
 			return
-		default:
-			if scanner.Scan() {
-				var data map[string]interface{}
-				err := json.Unmarshal(scanner.Bytes(), &data)
-				if err != nil {
-					log.Errorf("Error parsing JSON: %v", err)
-					continue
-				}
-				log.Debugf("Received data: %v", data)
-				messages <- data
-			} else if err := scanner.Err(); err != nil {
-				log.Errorf("Error reading response: %v", err)
-				return
-			}
+		case <-time.After(15 * time.Second): // Wait before retrying
 		}
 	}
 }
@@ -272,7 +291,7 @@ func onReady() {
 	syncSubscriptions()
 
 	systray.SetIcon(iconIco)
-	tooltip := "Walzen Ntfy Toast Client v0.0.3"
+	tooltip := "Walzen Ntfy Toast Client v0.0.4"
 	systray.SetTooltip(tooltip)
 	systray.SetTitle(tooltip)
 
