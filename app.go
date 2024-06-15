@@ -297,7 +297,7 @@ func onReady() {
 	syncSubscriptions()
 
 	systray.SetIcon(iconIco)
-	tooltip := "Walzen Ntfy Toast Client v0.0.4"
+	tooltip := "Walzen Ntfy Toast Client v0.0.5"
 	systray.SetTooltip(tooltip)
 	systray.SetTitle(tooltip)
 
