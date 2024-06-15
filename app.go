@@ -111,6 +111,20 @@ func watchConfig(watchPath string) (*fsnotify.Watcher, error) {
 	return watcher, nil
 }
 
+func readWithCancellation(scanner *bufio.Scanner, lines chan []byte, topicUrl string) {
+	for scanner.Scan() {
+		lines <- scanner.Bytes()
+	}
+	if err := scanner.Err(); err != nil {
+		log.Warnf("Error reading response: %v", err)
+		return
+	} else {
+		// Handle case where scanner.Scan() returns false without an error
+		log.Warnf("Subscription to %s ended unexpectedly", topicUrl)
+		return
+	}
+}
+
 func subscribe(ctx context.Context, topic Topic, messages chan<- map[string]interface{}) {
 	url := fmt.Sprintf("%s/json", topic.URL)
 	req, err := http.NewRequest("GET", url, nil)
@@ -139,40 +153,32 @@ func subscribe(ctx context.Context, topic Topic, messages chan<- map[string]inte
 			}()
 
 			scanner := bufio.NewScanner(resp.Body)
+			lines := make(chan []byte)
+			go readWithCancellation(scanner, lines, topic.URL)
 			for {
 				select {
 				case <-ctx.Done():
 					log.Infof("Stopping subscription to %s", url)
 					return
-				default:
-					if scanner.Scan() {
-						var data map[string]interface{}
-						err := json.Unmarshal(scanner.Bytes(), &data)
-						if err != nil {
-							log.Errorf("Error parsing JSON: %v", err)
-							continue
-						}
-						log.Debugf("Received data: %v", data)
-						messages <- data
-					} else if err := scanner.Err(); err != nil {
-						log.Errorf("Error reading response: %v", err)
-						return
-					} else {
-						// Handle case where scanner.Scan() returns false without an error
-						log.Warnf("Subscription to %s ended unexpectedly", url)
-						return
+				case line := <-lines:
+					var data map[string]interface{}
+					err := json.Unmarshal(line, &data)
+					if err != nil {
+						log.Errorf("Error parsing JSON: %v", err)
+						continue
 					}
+					log.Debugf("Received data: %v", data)
+					messages <- data
 				}
 			}
 		}()
 
-		log.Infof("Reconnecting to %s", url)
 		select {
 		case <-ctx.Done():
-			log.Infof("Stopping subscription to %s due to context done", url)
 			return
 		case <-time.After(15 * time.Second): // Wait before retrying
 		}
+		log.Infof("Reconnecting to %s", url)
 	}
 }
 
@@ -231,9 +237,9 @@ func showNotification(data map[string]interface{}, topicURL string) {
 		if url, ok := a["url"]; ok {
 			if toastNotification.Actions != nil {
 				toastNotification.Actions = append(toastNotification.Actions, toast.Action{
-					Type: "protocol",
-					Label: "View Attachment",
-					Arguments: url.(string),
+					Type:        "protocol",
+					Label:       "View Attachment",
+					Arguments:   url.(string),
 					HintInputId: "2",
 				})
 			} else {
