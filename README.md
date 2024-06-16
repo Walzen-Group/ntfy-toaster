@@ -17,7 +17,7 @@ Notifations are retrieved via JSON stream. A reconnection attempt will be made e
 
 ## Example
 
-Default PWA notification:
+Comparison with PWA notification:
 
 ![WebNormal](https://github.com/Walzen-Group/ntfy-toaster/assets/18438899/502e4e44-6fa6-4b5a-b933-dcfecca37153)
 ![ClientNormal](https://github.com/Walzen-Group/ntfy-toaster/assets/18438899/2ea0291e-0345-4f65-8065-0228e4c89bd9)
