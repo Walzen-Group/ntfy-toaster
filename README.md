@@ -52,3 +52,8 @@ topics:
 ~~If you want to see the raw output or error / info messages, you can run the app in a terminal.~~
 
 Currently not working.
+
+## Attribution
+
+- ntfy.sh - The one and only
+- golang toast (https://github.com/go-toast/toast, https://github.com/ShinyTrash/abc) - Interface to deliver toast notifications in golang
