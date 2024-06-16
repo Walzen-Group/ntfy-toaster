@@ -215,7 +215,7 @@ func stripProtocol(topicURL string) string {
 		log.Errorf("Error parsing URL: %v", err)
 		return topicURL // Return the original URL if parsing fails
 	}
-	return parsedURL.Host
+	return parsedURL.Host + parsedURL.Path
 }
 
 func showNotification(data map[string]interface{}, topicURL string) {
@@ -355,7 +355,7 @@ func onReady() {
 	syncSubscriptions()
 
 	systray.SetIcon(ntfyIco)
-	tooltip := "Walzen Ntfy Toast Client v0.0.9"
+	tooltip := "Walzen Ntfy Toast Client v0.1.0"
 	systray.SetTooltip(tooltip)
 	systray.SetTitle(tooltip)
 
