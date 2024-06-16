@@ -1,7 +1,7 @@
 # Walzen NTFY Toaster for Windows
 
 Unfortunately, ntfy has no native super simple Windows client to receive notifications.
-This small app solves this! Its focus is on extreme simplicity.
+This small app aims to solve this!
 
 You can subscribe to topics via a config.yaml file.
 
