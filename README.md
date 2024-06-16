@@ -1,11 +1,19 @@
 # Walzen NTFY Toaster for Windows
 
-Unfortunately, ntfy has no native windows client to receive notifications.
-This small app solves this!
+Unfortunately, ntfy has no native super simple Windows client to receive notifications.
+This small app solves this! Its focus is on extreme simplicity.
 
 You can subscribe to topics via a config.yaml file.
 
-Feature parity with the PWA client is almost there. In addition, there is support for attachments and click URLs via toast buttons!
+Feature parity with the PWA client is almost there.
+
+We support
+- Priority
+- Notify about presence of file attachments
+- Display button to go to configured click URL
+- Emoji tags
+
+Notifations are retrieved via JSON stream. A reconnection attempt will be made every 15 seconds if a server is unreachable.
 
 ## Example
 
