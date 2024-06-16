@@ -57,3 +57,5 @@ Currently not working.
 
 - ntfy.sh - The one and only
 - golang toast (https://github.com/go-toast/toast, https://github.com/ShinyTrash/abc) - Interface to deliver toast notifications in golang
+- systray - lightweight golang system tray library
+- yaml - library to parse yaml in golang
