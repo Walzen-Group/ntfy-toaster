@@ -252,7 +252,7 @@ func showNotification(data map[string]interface{}, topicURL string) {
 	viaString := fmt.Sprintf("via %s", stripProtocol(topicURL))
 
 	appId := "Walzen Ntfy"
-	imagePath := filepath.Join(configPath, "assets", ntfyIcoPath)
+	imagePath := filepath.Join(configPath, ntfyIcoPath)
 
 
 	if p, ok := data["priority"].(float64); ok {
@@ -355,7 +355,7 @@ func onReady() {
 	syncSubscriptions()
 
 	systray.SetIcon(ntfyIco)
-	tooltip := "Walzen Ntfy Toast Client v0.0.8"
+	tooltip := "Walzen Ntfy Toast Client v0.0.9"
 	systray.SetTooltip(tooltip)
 	systray.SetTitle(tooltip)
 
