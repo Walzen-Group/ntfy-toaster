@@ -111,16 +111,18 @@ func watchConfig(watchPath string) (*fsnotify.Watcher, error) {
 	return watcher, nil
 }
 
-func readWithCancellation(scanner *bufio.Scanner, lines chan []byte, topicUrl string) {
+func readWithCancellation(scanner *bufio.Scanner, lines chan []byte, topicUrl string, ctrl chan string) {
 	for scanner.Scan() {
 		lines <- scanner.Bytes()
 	}
 	if err := scanner.Err(); err != nil {
 		log.Warnf("Error reading response: %v", err)
+		ctrl <- "disconnect"
 		return
 	} else {
 		// Handle case where scanner.Scan() returns false without an error
 		log.Warnf("Subscription to %s ended unexpectedly", topicUrl)
+		ctrl <- "disconnect"
 		return
 	}
 }
@@ -154,9 +156,14 @@ func subscribe(ctx context.Context, topic Topic, messages chan<- map[string]inte
 
 			scanner := bufio.NewScanner(resp.Body)
 			lines := make(chan []byte)
-			go readWithCancellation(scanner, lines, topic.URL)
+			ctrl := make(chan string)
+			go readWithCancellation(scanner, lines, topic.URL, ctrl)
 			for {
 				select {
+				case cmd := <-ctrl:
+					if cmd == "disconnect" {
+						return
+					}
 				case <-ctx.Done():
 					log.Infof("Stopping subscription to %s", url)
 					return
