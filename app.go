@@ -25,7 +25,26 @@ import (
 )
 
 //go:embed assets/ntfy.ico
-var iconIco []byte
+var ntfyIco []byte
+const ntfyIcoPath = "assets/ntfy.ico"
+
+//go:embed assets/ntfy_minprio.ico
+var ntfyMinPrioIco []byte
+const ntfyMinPrioIcoPath = "assets/ntfy_minprio.ico"
+
+//go:embed assets/ntfy_lowprio.ico
+var ntfyLowPrioIco []byte
+const ntfyLowPrioIcoPath = "assets/ntfy_lowprio.ico"
+
+//go:embed assets/ntfy_highprio.ico
+var ntfyHighPrioIco []byte
+const ntfyHighPrioIcoPath = "assets/ntfy_highprio.ico"
+
+//go:embed assets/ntfy_maxprio.ico
+var ntfyMaxPrioIco []byte
+const ntfyMaxPrioIcoPath = "assets/ntfy_maxprio.ico"
+
+
 
 type Config struct {
 	Topics map[string]Topic `yaml:"topics"`
@@ -230,16 +249,38 @@ func showNotification(data map[string]interface{}, topicURL string) {
 		}
 	}
 
+	viaString := fmt.Sprintf("via %s", stripProtocol(topicURL))
+
+	appId := "Walzen Ntfy"
+	imagePath := filepath.Join(configPath, "assets", ntfyIcoPath)
+
+
+	if p, ok := data["priority"].(float64); ok {
+		switch (p) {
+		case 1:
+			appId += " (Min Prio)"
+			imagePath = filepath.Join(configPath, ntfyMinPrioIcoPath)
+		case 2:
+			appId += " (Low Prio)"
+			imagePath = filepath.Join(configPath, ntfyLowPrioIcoPath)
+		case 4:
+			appId += " (High Prio)"
+			imagePath = filepath.Join(configPath, ntfyHighPrioIcoPath)
+		case 5:
+			appId += " (Max Prio)"
+			imagePath = filepath.Join(configPath, ntfyMaxPrioIcoPath)
+		}
+	}
+
 	activationUrl := topicURL
 
-	imagePath := filepath.Join(configPath, "assets", "ntfy.ico")
 
 	toastNotification := toast.Notification{
-		AppID:               "Walzen Ntfy Toaster",
+		AppID:               appId,
 		Title:               title,
 		Message:             message,
 		Icon:                imagePath,
-		Attribution:         fmt.Sprintf("via %s", stripProtocol(topicURL)),
+		Attribution:         viaString,
 		ActivationType:      "protocol",
 		ActivationArguments: activationUrl,
 	}
@@ -313,8 +354,8 @@ func onReady() {
 
 	syncSubscriptions()
 
-	systray.SetIcon(iconIco)
-	tooltip := "Walzen Ntfy Toast Client v0.0.7"
+	systray.SetIcon(ntfyIco)
+	tooltip := "Walzen Ntfy Toast Client v0.0.8"
 	systray.SetTooltip(tooltip)
 	systray.SetTitle(tooltip)
 
@@ -352,19 +393,41 @@ func openExplorer(path string) {
 	}
 }
 
-func main() {
-
-	outputPath := filepath.Join(configPath, "assets", "ntfy.ico")
-
+func writeIcons() {
 	// Create the directory if it doesn't exist
-	if err := os.MkdirAll(filepath.Dir(outputPath), os.ModePerm); err != nil {
+	if err := os.MkdirAll(filepath.Join(configPath, "assets"), os.ModePerm); err != nil {
 		panic(err)
 	}
 
-	// Write the embedded file to the target location
-	if err := os.WriteFile(outputPath, iconIco, os.ModePerm); err != nil {
-		panic(err)
+	if _, err := os.Stat(filepath.Join(configPath, "assets", "ntfy.ico")); os.IsNotExist(err) {
+		if err := os.WriteFile(filepath.Join(configPath, "assets", "ntfy.ico"), ntfyIco, os.ModePerm); err != nil {
+			panic(err)
+		}
 	}
+	if _, err := os.Stat(filepath.Join(configPath, "assets", "ntfy_minprio.ico")); os.IsNotExist(err) {
+		if err := os.WriteFile(filepath.Join(configPath, "assets", "ntfy_minprio.ico"), ntfyMinPrioIco, os.ModePerm); err != nil {
+			panic(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(configPath, "assets", "ntfy_lowprio.ico")); os.IsNotExist(err) {
+		if err := os.WriteFile(filepath.Join(configPath, "assets", "ntfy_lowprio.ico"), ntfyLowPrioIco, os.ModePerm); err != nil {
+			panic(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(configPath, "assets", "ntfy_highprio.ico")); os.IsNotExist(err) {
+		if err := os.WriteFile(filepath.Join(configPath, "assets", "ntfy_highprio.ico"), ntfyHighPrioIco, os.ModePerm); err != nil {
+			panic(err)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(configPath, "assets", "ntfy_maxprio.ico")); os.IsNotExist(err) {
+		if err := os.WriteFile(filepath.Join(configPath, "assets", "ntfy_maxprio.ico"), ntfyMaxPrioIco, os.ModePerm); err != nil {
+			panic(err)
+		}
+	}
+}
+
+func main() {
+	writeIcons()
 
 	if _, err := os.Stat(configFile); os.IsNotExist(err) {
 		_ = os.MkdirAll(configPath, os.ModePerm)
