@@ -5,6 +5,21 @@ This small app solves this!
 
 You can subscribe to topics via a config.yaml file.
 
+Feature parity with the PWA client is almost there. In addition, there is support for attachments and click URLs via toast buttons!
+
+## Example
+
+Default PWA notification:
+
+![WebNormal](https://github.com/Walzen-Group/ntfy-toaster/assets/18438899/502e4e44-6fa6-4b5a-b933-dcfecca37153)
+![ClientNormal](https://github.com/Walzen-Group/ntfy-toaster/assets/18438899/2ea0291e-0345-4f65-8065-0228e4c89bd9)
+
+Additional features:
+
+![clickurl](https://github.com/Walzen-Group/ntfy-toaster/assets/18438899/6dce23a1-5f77-438b-add6-9e4a4d77c80b)
+![attachment](https://github.com/Walzen-Group/ntfy-toaster/assets/18438899/73e9a595-6a50-4b87-9045-2dd972d964a0)
+
+
 ## Installation
 
 Download executable and run. In the tray, you can right click on the ntfy icon and select "Open Config", which will open the app directory for you.
