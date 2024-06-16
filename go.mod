@@ -3,11 +3,10 @@ module github.com/Walzen-Group/ntfy-go-toaster
 go 1.22.0
 
 require (
-	github.com/Walzen-Group/golang-toast-11 v0.0.2
+	github.com/Walzen-Group/golang-toast-11 v0.0.4
 	github.com/getlantern/systray v1.2.2
 	github.com/sirupsen/logrus v1.9.3
 	gopkg.in/yaml.v2 v2.4.0
-	github.com/akavel/rsrc v0.10.2
 )
 
 require (

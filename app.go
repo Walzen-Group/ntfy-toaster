@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -189,6 +190,15 @@ func subscribe(ctx context.Context, topic Topic, messages chan<- map[string]inte
 	}
 }
 
+func stripProtocol(topicURL string) string {
+	parsedURL, err := url.Parse(topicURL)
+	if err != nil {
+		log.Errorf("Error parsing URL: %v", err)
+		return topicURL // Return the original URL if parsing fails
+	}
+	return parsedURL.Host
+}
+
 func showNotification(data map[string]interface{}, topicURL string) {
 	var title, message, tags string
 
@@ -225,11 +235,11 @@ func showNotification(data map[string]interface{}, topicURL string) {
 	imagePath := filepath.Join(configPath, "assets", "ntfy.ico")
 
 	toastNotification := toast.Notification{
-		AppID:               "Woaster Ntfy",
+		AppID:               "Walzen Ntfy Toaster",
 		Title:               title,
 		Message:             message,
 		Icon:                imagePath,
-		Attribution:         fmt.Sprintf("via %s", topicURL),
+		Attribution:         fmt.Sprintf("via %s", stripProtocol(topicURL)),
 		ActivationType:      "protocol",
 		ActivationArguments: activationUrl,
 	}
@@ -304,7 +314,7 @@ func onReady() {
 	syncSubscriptions()
 
 	systray.SetIcon(iconIco)
-	tooltip := "Walzen Ntfy Toast Client v0.0.6"
+	tooltip := "Walzen Ntfy Toast Client v0.0.7"
 	systray.SetTooltip(tooltip)
 	systray.SetTitle(tooltip)
 
